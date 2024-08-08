@@ -23,7 +23,7 @@ def create_resized_part(video, start_time, end_time, index, size):
 
 def create_composite_video(background_video, overlay_video):
     overlay_video_duration = overlay_video.duration
-    print(f"Width: {width}, Height: {height}")
+    # print(f"Width: {width}, Height: {height}")
     # Specify the width and height
     # Repeat Video 2 until its length matches the length of Video 1
     repeated_clips = []
@@ -55,22 +55,25 @@ def repeat_background_clip(overlay_video_duration, background_video):
         current_duration += clip_duration
 
     # Concatenate repeated clips of Video 2
-    background_video_repeated = concatenate_videoclips(repeated_clips)
+    background_video_repeated2 = concatenate_videoclips(repeated_clips)
+    background_video_repeated = background_video_repeated2.without_audio()
     return background_video_repeated
     
     
-overlay_video = VideoFileClip("babi.mp4").subclip(5,20)
+overlay_video = VideoFileClip("z1.mp4")
 # Get the width and height
 width, height = overlay_video.size
 height = int(width * 16 / 9)
 print(f"Width: {width}, Height: {height}")
 
+print("duration", overlay_video.duration)
+
 background_video1 = VideoFileClip("bg1.mp4")
 width1, height1 = background_video1.size
-print(f"Width: {width1}, Height: {height1}")
+print(f"Width2: {width1}, Height2: {height1}")
 background_video1 = background_video1.resize(width/width1)
 background_video = repeat_background_clip(overlay_video.duration, background_video1)
-background_video.write_videofile("bg_fit3.mp4")   
+background_video.write_videofile("z1_fit3.mp4")   
 
 # Loop through each part, create and resize
 partnum = 100
@@ -87,7 +90,7 @@ for i in range(partnum):
     size  += direction * default_size_step
     if(size > default_size_max or size < default_size_min):
         direction = direction * -1
-    print(size)
+    # print(size)
     resized_part = create_resized_part(overlay_video, start_time, end_time, i+1, size)
     background_video_sub = background_video.subclip(start_time, end_time)
     compo_part = create_composite_video(background_video_sub, resized_part)
@@ -95,5 +98,5 @@ for i in range(partnum):
     # compo_part.write_videofile("compo_part"+ str(i+1)+ ".mp4") 
 # Concatenate all the resized video parts
 overlay_video = concatenate_videoclips(video_parts)    
-overlay_video.write_videofile("overlay3.mp4")   
+overlay_video.write_videofile("z1out.mp4")   
 

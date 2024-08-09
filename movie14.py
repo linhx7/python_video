@@ -22,8 +22,6 @@ def create_resized_part(video, start_time, end_time, index, size):
     
     video_with_text = part
     resized_video = video_with_text.resize(size)
-    width, height = video.size
-    height = int(width * 16 / 9)
     return resized_video
 
 def create_composite_video(background_video, overlay_video):
@@ -81,22 +79,28 @@ def conver_video(infile, outile):
     # background_video.write_videofile("z1_fit3.mp4")   
 
     # Create a black color clip with the specified dimensions
-    background_video1 = ColorClip(size=(width, int(width * 16 / 9)), color=(255, 0, 0))
-    # Set the duration of the clip (e.g., 10 seconds)
-    background_video1 = background_video1.set_duration(3)
-    background_video2 = ColorClip(size=(width, int(width * 16 / 9)), color=(255, 255, 255))
-    # Set the duration of the clip (e.g., 10 seconds)
-    background_video2 = background_video2.set_duration(3)
-    background_video3 = concatenate_videoclips([background_video1, background_video2])
+    background_video3 = VideoFileClip("bg1.mp4")
+    
+    
+    
+    # background_video1 = ColorClip(size=(width, int(width * 16 / 9)), color=(0, 0, 0))
+    # # Set the duration of the clip (e.g., 10 seconds)
+    # background_video1 = background_video1.set_duration(3)
+    # background_video2 = ColorClip(size=(width, int(width * 16 / 9)), color=(10, 0, 0))
+    # # Set the duration of the clip (e.g., 10 seconds)
+    # background_video2 = background_video2.set_duration(3)
+    # background_video3 = concatenate_videoclips([background_video1, background_video2])
+    
+    widthbg, heightbg = background_video3.size
     background_video = repeat_background_clip(overlay_video.duration, background_video3)
     # background_video.write_videofile("test.mp4")  
     # Loop through each part, create and resize
-    partnum = 100
+    partnum = 10
     duration_per_part = overlay_video.duration / partnum
     video_parts = []
-    default_size_min = 0.93
-    default_size_max = 0.97
-    default_size_step = 0.001
+    default_size_min = 0.90
+    default_size_max = 0.93
+    default_size_step = 0.01
     size = default_size_min
     direction = 1
     for i in range(partnum):
@@ -106,7 +110,7 @@ def conver_video(infile, outile):
         if(size > default_size_max or size < default_size_min):
             direction = direction * -1
         # print(size)
-        resized_part = create_resized_part(overlay_video, start_time, end_time, i+1, size)
+        resized_part = create_resized_part(overlay_video, start_time, end_time, i+1, size * widthbg / width)
         background_video_sub = background_video.subclip(start_time, end_time)
         compo_part = create_composite_video(background_video_sub, resized_part)
         video_parts.append(compo_part)
